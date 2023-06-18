@@ -1,0 +1,15 @@
+# Use Alpine Linux as the base image
+FROM alpine:latest
+
+# Update package repositories and install OpenSSH
+RUN apk update && apk upgrade && \
+    apk add --no-cache openssh
+
+# Generate host keys for SSH
+RUN ssh-keygen -A
+
+# Expose port 22 for SSH
+EXPOSE 22
+
+# Start OpenSSH server daemon
+CMD ["/usr/sbin/sshd", "-D"]
