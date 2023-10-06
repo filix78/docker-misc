@@ -1,0 +1,33 @@
+# Use an official Ubuntu as a parent image
+FROM ubuntu:latest
+
+# Set environment variables for GitWeb
+ENV GITWEB_PROJECTROOT=/var/git
+ENV GITWEB_LIST=1
+ENV GITWEB_OWNER="Your Name"
+
+# Install required packages
+RUN apt-get update && \
+    apt-get install -y git gitweb apache2
+
+# Create a Git repository directory
+RUN mkdir -p /var/git && \
+    chmod 755 /var/git && \
+    cd /var/git && \
+    git init --bare sample.git
+
+# Copy GitWeb configuration
+COPY gitweb1.conf /etc/gitweb.conf
+
+# Copy Apache config
+COPY gitweb.conf /etc/apache2/sites-available/000-default.conf
+
+# Enable CGI module and enable the site
+RUN a2enmod cgi && \
+    a2ensite 000-default
+
+# Expose the necessary ports
+EXPOSE 80
+
+# Start Apache server
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
