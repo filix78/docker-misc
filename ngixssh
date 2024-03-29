@@ -1,0 +1,21 @@
+# Use a base image with Nginx installed
+FROM nginx:latest
+
+# Install OpenSSH Server
+RUN apt-get update && apt-get install -y openssh-server
+
+# Create a directory for SSH keys
+RUN mkdir /var/run/sshd
+
+# Set root password (change 'password' to your desired password)
+RUN echo 'root:password' | chpasswd
+
+# Allow root login via SSH
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# Expose port 22 for SSH and port 80 for HTTP
+EXPOSE 22
+EXPOSE 80
+
+# Start both SSH and Nginx services
+CMD service ssh start && nginx -g 'daemon off;'

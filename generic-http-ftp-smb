@@ -1,0 +1,30 @@
+# Use a base image with necessary packages installed
+FROM ubuntu:latest
+
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y \
+    apache2 \
+    vsftpd \
+    samba
+
+# Configure Apache web server
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Configure vsftpd FTP server
+RUN sed -i 's/#write_enable=YES/write_enable=YES/' /etc/vsftpd.conf
+
+# Configure Samba shares
+RUN mkdir -p /srv/samba/share
+RUN echo "[share]" >> /etc/samba/smb.conf
+RUN echo "   comment = Shared Folder" >> /etc/samba/smb.conf
+RUN echo "   path = /srv/samba/share" >> /etc/samba/smb.conf
+RUN echo "   browseable = yes" >> /etc/samba/smb.conf
+RUN echo "   guest ok = yes" >> /etc/samba/smb.conf
+RUN echo "   read only = no" >> /etc/samba/smb.conf
+
+# Expose ports
+EXPOSE 80/tcp 21/tcp 445/tcp
+
+# Start services
+CMD service apache2 start && service vsftpd start && smbd --foreground --no-process-group
