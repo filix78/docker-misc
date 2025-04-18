@@ -1,0 +1,9 @@
+# Use the official Arch Linux base-devel image
+FROM archlinux:base-devel
+
+# Update the system and install
+RUN pacman -Syu --noconfirm \
+    && pacman -S --noconfirm openssh cmake extra-cmake-modules nano python-pip python-pipx\
+    && pacman -Scc --noconfirm
+
+RUN pipx install conan && pipx ensurepath
